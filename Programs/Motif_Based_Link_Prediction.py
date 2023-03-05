@@ -11,35 +11,37 @@ DiGraph.neighbors(n)
 DiGraph.predecessors(n)
 
 """
+import random
+from itertools import combinations
+import itertools
 
 import networkx as nx
 import math
 import pickle
-import random
+
 import numpy as np
 import pandas as pd
 from sklearn import metrics
-from itertools import combinations
 from pandas import DataFrame
 import matplotlib.pyplot as plt
-import itertools
 
-base_path = 'D:/Documents/Research Projects/Complex Networks Researches/Motif Based Link Prediction/Networks/'
-pp = base_path + 'Networks'
+
+# base_path = 'D:/Documents/Research Projects/Complex Networks Researches/Motif Based Link Prediction/'
+# pp = base_path + 'Networks'
 # pp = project path
 networks = ['Citation_', 'Ecoli', 'Email_', 'Human', 'Metabolic_', 'Mouse', 'Recommendation_', 'Twitter_', 'Wiki', 'Yeast']
 cnetworks= ['citation' , 'biological', 'friendship','human', 'metabolic','mouse','reco', 'twitter','wiki','biological-2']
 # LP_models = ['CNI', 'CNO', 'CNIO', 'AA', 'RA', 'TC', 'MS', 'MyMS']
-LP_models = [ 'TC']
+LP_models = ['CNI', 'CNO', 'CNIO', 'AA', 'RA', 'MS']
 
-def delete_me():
-    for M in LP_models:
-        dd = []
-        for i in networks:
-            df = pd.read_csv(base_path + f'6548{i} results.csv')[M].mean()
-            dd.append(df)
-        for i in range(len(networks)):
-            print(f'{M} {networks[i]} :\t {dd[i]}')
+# def delete_me():
+#     for M in LP_models:
+#         dd = []
+#         for i in networks:
+#             df = pd.read_csv(base_path + f'6548{i} results.csv')[M].mean()
+#             dd.append(df)
+#         for i in range(len(networks)):
+#             print(f'{M} {networks[i]} :\t {dd[i]}')
        
 
 
@@ -49,18 +51,17 @@ def start():
         results = []        
         for i in range(3):
             gT, gP = nx.DiGraph(), nx.DiGraph()
-            gT = pickle.load(open(f'{pp}/{networks[net]}/{cnetworks[net]}_train{i}.gml','rb'))
-            gP = pickle.load(open(f'{pp}/{networks[net]}/{cnetworks[net]}_test{i}.gml','rb'))
+            gT = pickle.load(open(f'Networks/Networks/{networks[net]}/{cnetworks[net]}_train{i}.gml','rb'))
+            gP = pickle.load(open(f'Networks/Networks/{networks[net]}/{cnetworks[net]}_test{i}.gml','rb'))
             results.append(experiment(gT, gP))
             print(f'{cnetworks[net]}_test{i} ... is completed')
         df = DataFrame(results, columns=LP_models)
-        df.to_csv(f'D:/Documents/Research Projects/Complex Networks Researches/Motif Based Link Prediction/Networks/{title}{networks[net]} results.csv')
-
+        df.to_csv(f'Networks/{title}{networks[net]} results.csv')
 
 
 def plotting():
     for i in networks:
-        df = pd.read_csv(f'D:/Documents/Research Projects/Complex Networks Researches/Motif Based Link Prediction/Networks/total - results.csv')
+        df = pd.read_csv('Networks/America2 results.csv')
         # plot_df(df, i)
         Plotting(df, i)
 
@@ -121,7 +122,7 @@ def Plotting(df, title):
     plt.show()
     
 def lines_plot2():
-    df = pd.read_csv(base_path + 'Results 2.csv')
+    df = pd.read_csv('Networks/Results 2.csv')
     fig, axe = plt.subplots(dpi=450)
     axe.plot(df[['FFL', 'MS2']], linewidth = 3)
     axe.plot(df[['MS', 'CNI', 'CNO', 'CNIO', 'AA', 'RA']], linewidth = 1)
@@ -133,12 +134,12 @@ def lines_plot2():
     ticks = df.index.tolist()
     plt.xticks(ticks, df.Networks)
     plt.tight_layout()
-    plt.savefig(base_path+'Results 2.png', dpi = 450)
+    plt.savefig('Networks/Results 2.png', dpi = 450)
     plt.show()
 
 
 def lines_plot():
-    df = pd.read_csv(base_path + 'total - Results.csv')
+    df = pd.read_csv('Networks/total - Results.csv')
     fig, axe = plt.subplots(dpi=450)
     axe.plot(df[['FFL']], linewidth = 3)
     axe.plot(df[['MS', 'CNI', 'CNO', 'CNIO', 'AA', 'RA', 'Deep']], linewidth = 0.91)
@@ -150,7 +151,7 @@ def lines_plot():
     ticks = df.index.tolist()
     plt.xticks(ticks, df.Networks)
     plt.tight_layout()
-    plt.savefig(base_path+'Results.png', dpi = 450)
+    plt.savefig('Networks/Results.png', dpi = 450)
     plt.show()
 
 
@@ -213,7 +214,6 @@ def find_auc(Gp, S):
         pred.append(S[key])
 
     return metrics.roc_auc_score(Y, pred)
-
 
 
 def LP(a, gT, u, v, Nu_in, Nu_out, Nv_in, Nv_out, F):
